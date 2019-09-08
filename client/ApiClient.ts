@@ -101,7 +101,7 @@ export class ApiClient {
     }
 
     private async _request(endPoint: string, data: IRequestData): Promise<IRespondData> {
-        this.lastRequest = {endPoint, data,};
+        this.lastRequest = {endPoint, data};
         this.nonce++;
         // Constructing request
         const encryptionService: EncryptionService = new EncryptionService();
@@ -111,8 +111,9 @@ export class ApiClient {
         });
         data.version = this.version;
         data.versionKey = this.versionKey;
-        data.timestamp = this.currentTimestamp;
         data.session = this.user? this.user.session: null;
+        data.timestamp = data.timestamp? data.timestamp: this.currentTimestamp;
+        delete data.cacheKey;
         data.cacheKey = crypto.createHash('md5').update(JSON.stringify(data)).digest('hex');
         const payload = !this.localSendInvalidRequestData?
             encryptionService.encrypt(Buffer.from(JSON.stringify(data)),this.nonce):
@@ -163,7 +164,6 @@ export class ApiClient {
                             return;
                         }
                         const payload = JSON.parse(data.toString());
-                        console.log(endPoint,payload);
                         if(this.serverTimestamp-this.currentTimestamp > 3600){
                             reject(new ApiError(ErrorCode.InvalidTimestamp));
                         }

@@ -260,7 +260,6 @@ describe('/cards/*, success', () => {
       assert.isTrue(apiClient.canResend);
       const respondData = await apiClient.resend();
       assert.isFalse(apiClient.canResend);
-      console.log('213213213',respondData);
       assert.equal(respondData.body.card.monsterId, monsterId);
       assert.isTrue(respondData.isCache);
     } catch (e) {
